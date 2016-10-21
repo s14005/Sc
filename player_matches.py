@@ -1,6 +1,7 @@
-import requests,re
+import requests
 from bs4 import BeautifulSoup
 from python_utils import converters
+import re
 
 def get_parsed_page(url):
     return BeautifulSoup(requests.get(url).text, "lxml")
@@ -40,7 +41,11 @@ def get_death(num):
     return death
 
 def get_kd_ratio(num):
-    ratio = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:10%;float:left;text-align:center"})[num+1].text
+    if (get_adr(0) == None):
+        ratio = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:10%;float:left;text-align:center"})[num+1].text
+    else:
+        ratio = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:8%;float:left;text-align:center"})[num+1].text
+
     return ratio
 
 def get_adr(num):
@@ -51,16 +56,34 @@ def get_adr(num):
         return None
 
 def get_rating(num):
-    rating = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:10%;float:left;text-align:center"})[num+2].text
+    #rating = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:10%;float:left;text-align:center"})[num+2].text
+    if get_adr(0) == None:
+        rating = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:10%;float:left;text-align:center"})[num+2].text
+    else:
+        rating = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:8%;float:left;text-align:center"})[num+2].text
     return rating
+
 m = 1
 while 11 > m:
 
+    ###print(get_match_id()) un-use
+    #print(get_player_id(1*m-1)) #0 #1 #OK
+    #print(get_kill(3*m-3))#0 #3
+    #print(get_assist(2*m-2))#0 #2
+    #print(get_death(2*m-1))#1 #2
+    #print(get_kd_ratio(3*m-2)) #1
+    #print(get_rating(3*m-1)) #2
+
+
     print(get_player_id(1*m-1)) #OK
-    print(get_kill(3*m-3)) #OK
+    #print(get_kill(3*m-3)) #OK
+    print(get_kill(2*m-2))
     print(get_assist(2*m-2)) #OK
     print(get_death(2*m-2)) #OK
-    print(get_kd_ratio(3*m-3)) #OK
-    print(get_adr(m-1))
-    print(get_rating(3*m-3)) #OK
+
+    #print(get_kd_ratio(3*m-3)) #3
+    print(get_kd_ratio(2*m-3))
+    print(get_adr(m-1))#OK
+    #print(get_rating(3*m-3)) #3
+    print(get_rating(2*m-3))
     m+=1
