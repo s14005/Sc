@@ -5,11 +5,13 @@ from python_utils import converters
 def get_parsed_page(url):
     return BeautifulSoup(requests.get(url).text, "lxml")
 
-urls = "http://www.hltv.org/?pageid=188&matchid=27996"
+urls = "http://www.hltv.org/?pageid=188&matchid=29000"
+
+
 matches = get_parsed_page(urls)
 
-def get_most_kills_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[0]
+def get_most_kills_user_id(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
     ta = ka.find("a")["href"]
     l = len(ta)
     elta = ta[8:]
@@ -20,39 +22,37 @@ def get_most_kills_user_id():
     elif l < 23:
         return da
 
-def get_most_kills_score():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[0].text
+def get_most_kills_score(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
     return ka
 
-def get_most_damage_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
 
-    if len(ka) == 5:
+def get_most_damage_user_id(num):
+    sa = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
+    ta = ka.find("a")["href"]
+    l = len(ta)
+    elta = ta[8:]
+    transInt = re.match("\d*",elta)
+    da = transInt.group()
+    if len(sa) <= 5:
+        return None
+    elif l >= 23:
+        return ta[22:]
+    elif l < 23:
+        return da
+
+def get_most_damage_score(num):
+    sa = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
+    if len(sa) <= 5:
         return None
     else:
-        ta = ka[1].find("a")["href"]
-        l = len(ta)
-        elta = ta[8:]
-        transInt = re.match("\d*",elta)
-        da = transInt.group()
-        if l >= 23:
-            return ta[22:]
-        elif l < 23:
-            return da
+        return ka
 
-def get_most_damage_score():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
-    if len(ka) == 5:
-        return None
-    else:
-        return ka[1].text
-
-def get_most_assists_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
-    if len(ka) == 5:
-        ta = ka[1].find("a")["href"]
-    else:
-        ta = ka[2].find("a")["href"]
+def get_most_assists_user_id(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
+    ta = ka.find("a")["href"]
     l = len(ta)
     elta = ta[8:]
     transInt = re.match("\d*",elta)
@@ -62,21 +62,14 @@ def get_most_assists_user_id():
     elif l < 23:
         return da
 
-
-def get_most_assists_score():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
-    if len(ka) == 5:
-        return ka[1].text
-    else:
-        return ka[2].text
+def get_most_assists_score(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
+    return ka
 
 
-def get_most_awp_kills_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
-    if len(ka) == 5:
-        ta = ka[2].find("a")["href"]
-    else:
-        ta = ka[3].find("a")["href"]
+def get_most_awp_kills_user_id(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
+    ta = ka.find("a")["href"]
     l = len(ta)
     elta = ta[8:]
     transInt = re.match("\d*",elta)
@@ -86,21 +79,15 @@ def get_most_awp_kills_user_id():
     elif l < 23:
         return da
 
-def get_most_awp_kills_score():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
-    if len(ka) == 5:
-        return ka[2].text
-    else:
-        return ka[3].text
+def get_most_awp_kills_score(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
+    return ka
 
 
 
-def get_most_first_kills_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
-    if len(ka) == 5:
-        ta = ka[3].find("a")["href"]
-    else:
-        ta = ka[4].find("a")["href"]
+def get_most_first_kills_user_id(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
+    ta = ka.find("a")["href"]
     l = len(ta)
     elta = ta[8:]
     transInt = re.match("\d*",elta)
@@ -110,20 +97,13 @@ def get_most_first_kills_user_id():
     elif l < 23:
         return da
 
-def get_most_first_kills_score():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
-    if len(ka) == 5:
-        return ka[3].text
-    else:
-        return ka[4].text
+def get_most_first_kills_score(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
+    return ka
 
-
-def get_best_rating_user_id():
-    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})
-    if len(ka) == 5:
-        ta = ka[4].find("a")["href"]
-    else:
-        ta = ka[5].find("a")["href"]
+def get_best_rating_user_id(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style": "font-weight:normal;width:125px;float:left;text-align:left"})[num]
+    ta = ka.find("a")["href"]
     l = len(ta)
     elta = ta[8:]
     transInt = re.match("\d*",elta)
@@ -133,26 +113,40 @@ def get_best_rating_user_id():
     elif l < 23:
         return da
 
-def get_best_rating_score():
+def get_best_rating_score(num):
+    ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})[num].text
+    return ka
+
+def get_top_players_score():
     ka = matches.findAll("div", {"class": "covSmallHeadline", "style":"font-weight:normal;width:30px;float:left;text-align:right"})
-    if len(ka) == 5:
-        return ka[4].text
-    else:
-        return ka[5].text
+    l = len(ka)
 
+    if l == 5:
+        print(get_most_kills_user_id(0))
+        print(get_most_kills_score(0))
+        print(get_most_damage_user_id(1))
+        print(get_most_damage_score(1))
+        print(get_most_assists_user_id(1))
+        print(get_most_assists_score(1))
+        print(get_most_awp_kills_user_id(2))
+        print(get_most_awp_kills_score(2))
+        print(get_most_first_kills_user_id(3))
+        print(get_most_first_kills_score(3))
+        print(get_best_rating_user_id(4))
+        print(get_best_rating_score(4))
 
+    elif l == 6:
+        #print(get_most_kills_user_id(0))
+        #print(get_most_kills_score(0))
+        #print(get_most_damage_user_id(1))
+        print(get_most_damage_score(1))
+        #print(get_most_assists_user_id(2))
+        #print(get_most_assists_score(2))
+        #print(get_most_awp_kills_user_id(3))
+        #print(get_most_awp_kills_score(3))
+        #print(get_most_first_kills_user_id(4))
+        #print(get_most_first_kills_score(4))
+        #print(get_best_rating_user_id(5))
+        #print(get_best_rating_score(5))
 
-#print(len(get_best_rating_score()))
-
-print(get_most_kills_user_id())
-print(get_most_kills_score())
-print(get_most_damage_user_id())
-print(get_most_damage_score())
-print(get_most_assists_user_id())
-print(get_most_assists_score())
-print(get_most_awp_kills_user_id())
-print(get_most_awp_kills_score())
-print(get_most_first_kills_user_id())
-print(get_most_first_kills_score())
-print(get_best_rating_user_id())
-print(get_best_rating_score())
+print(get_top_players_score())
