@@ -1,0 +1,58 @@
+保存
+matchipage21999
+match_id2007
+map_id3253
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+エラー一覧
+
+unti18076
+Traceback (most recent call last):
+  File "matches.py", line 522, in <module>
+    if tmp == bag(int(get_team_1_1_score())+int(get_team_2_1_score())):
+  File "matches.py", line 167, in bag
+    bb = bg.find_all("a")[num]["href"][21:]
+IndexError: list index out of range
+
+
+
+
+2760
+11月24日 木曜日　第１回プレプレゼン
+
+30日 第２回プレプレゼン
+データベース
+create table matches(match_id integer primary key autoincrement, event text, team_1_id int, team_2_id int, team_1_score int, team_2_score int, best_of int, date text);
+
+create table sets(match_id integer, sets_id integer primary key autoincrement, map_id int, team_1_id int, team_2_id int, team_1_map_score int, team_2_map_score int, first_kills_team1 int, first_kills_team2 int, clutches_won_team1 int, clutches_won_team2 int, round3_1 text, round3_2 text);
+
+create table player_matches(player_match_id integer primary key autoincrement, match_id integer, sets_id integer, map_id int, player_id int, kill int, assist int, death int, kd_ratio real, adr real, rating real);
+
+create table mvp_types(id int primary key, name text);
+
+create table top_players(top_id integer primary key autoincrement, player_id int, sets_id integer, mvp_type int, score real);
+
+
+
+
+matchipage22900
+match_id1973
+map_id3302
+

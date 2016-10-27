@@ -2,10 +2,10 @@ import requests, re
 from bs4 import BeautifulSoup
 from python_utils import converters
 import sqlite3
-connerctor = sqlite3.connect("test.db")
+connerctor = sqlite3.connect("hltv.db")
 #i = 25001
 #i =27993 #test
-i = 27993
+i = 21971
 def get_parsed_page(url):
     return BeautifulSoup(requests.get(url).text, "lxml")
 
@@ -55,6 +55,8 @@ def get_team_1_1_score():
     if get_best_of() == 1:
         if get_team_1_score() > get_team_2_score():
             return 1
+        elif get_team_1_score() == get_team_2_score():
+            return 0
         else:
             return 0
     else:
@@ -64,6 +66,8 @@ def get_team_2_1_score():
     if get_best_of() == 1:
         if get_team_1_score() < get_team_2_score():
             return 1
+        elif get_team_1_score() == get_team_2_score():
+            return 0
         else:
             return 0
     else:
@@ -71,8 +75,11 @@ def get_team_2_1_score():
 
 def get_best_of():
     bo = url1.find("div", {"id": "mapformatbox"}).text
-    ba = bo[13:14]
-    return int(ba)
+    if bo.split()[1] == "Best":
+        return int(bo[16:17])
+    else:
+        ba = bo[13:14]
+        return int(ba)
 
 def get_map_name(num):
     map_3 = url1.findAll("img", style= "border-radius: 4px;;")
@@ -158,6 +165,7 @@ def clutches_2_won():
         return clu[0]
 
 def bag(num):
+
      bg = matches.find_all("div", {"class": "tab_content"})[3]
      bb = bg.find_all("a")[num]["href"][21:]
 
@@ -393,10 +401,30 @@ def get_round_second_score(math,num):
     da = str(get_round_team_1(math,num)) + "-" + str(get_round_team_1(math,num+1)) + "-" + str(get_round_team_1(math,num+2))
     return da
 
-mapsid = 0
-mapid = 0
+def map_id(num):
+    if get_map_name(num) == "dust2":
+        return 1
+    elif get_map_name(num) == "inferno":
+        return 2
+    elif get_map_name(num) == "nuke":
+        return 3
+    elif get_map_name(num) == "train":
+        return 4
+    elif get_map_name(num) == "mirage":
+        return 5
+    elif get_map_name(num) == "cache":
+        return 6
+    elif get_map_name(num) == "cobblestone":
+        return 7
+    elif get_map_name(num) == "overpass":
+        return 8
+
+print("a")
+mapid = 1991#matche_id
+mapsid = 3228 #sets_id
 tmp = 100
-while 28003 > i:
+while 22000 > i: #28000
+
     urls2 = "http://www.hltv.org/?pageid=188&matchid=" + str(i)
     matches = get_parsed_page(urls2)
     print("atama")
@@ -429,61 +457,69 @@ while 28003 > i:
 
         print("insert into matches") #######
 
-    mapid += 1
+   # mapid += 1
     if int(get_best_of()) == 1:
         if tmp == bag(int(get_team_1_1_score())+int(get_team_2_1_score()-1)):
             print("unti")
             i += 1
         else:
-            sql = "insert into matches(event, team_1_id, team_2_id, team_1_name, team_2_name, team_1_score, team_2_score, best_of, map_name_1, map_name_2, map_name_3, map_name_4, map_name_5, win_team, lose_tame) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            mapid += 1
+            sql = "insert into matches(event, team_1_id, team_2_id, team_1_score, team_2_score, best_of, date) VALUES(?,?,?,?,?,?,?);"
 
-            connerctor.execute(sql,(event1(),get_team_1_id(),get_team_2_id(),get_team_1_name(),get_team_2_name(),get_team_1_1_score(),get_team_2_1_score(),get_best_of(),get_map_name(0),get_map_name(1),get_map_name(2),get_map_name(3),get_map_name(4),get_win_team(),get_lose_team()))
+            connerctor.execute(sql,(event1(),get_team_1_id(),get_team_2_id(),get_team_1_1_score(),get_team_2_1_score(),get_best_of(),get_date()))
 
-            for a in range(1, int(get_team_1_1_score())+int(get_team_2_1_score()+1)):
-                nu += 1
-                i = int(bag(0))
-                count += 1
-                mapsid += 1
-                urls2 = "http://www.hltv.org/?pageid=188&matchid=" + str(i)
+            #for a in range(1, int(get_team_1_1_score())+int(get_team_2_1_score()+1)):
+            nu += 1
+            i = int(bag(0))
+            count += 1
+            mapsid += 1
+            urls2 = "http://www.hltv.org/?pageid=188&matchid=" + str(i)
 
-                tmp = i
-                matches = get_parsed_page(urls2)
-                print("matchipage" + str(i))
-                print("match_id" + str(mapid))
-                print("map_id" + str(mapsid))
+            tmp = i
+            matches = get_parsed_page(urls2)
+            print("matchipage" + str(i))
+            print("match_id" + str(mapid))
+            print("map_id" + str(mapsid))
 
 #####round_history
                     #print(get_round_first_score(0,0))
                     #print(get_round_second_score(1,0))
 
 ###map.db
-                sql = "insert into maps(match_id, map_name, team_1_id, team_2_id, team_1_name, team_2_name, team_1_map_score, team_2_map_score, map_win_team, map_lose_team, date, first_kills_team1, first_kills_team2, clutches_won_team1, clutches_won_team2, round3_1, round3_2) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            sql = "insert into sets(match_id, map_id, team_1_id, team_2_id, team_1_map_score, team_2_map_score, first_kills_team1, first_kills_team2, clutches_won_team1, clutches_won_team2, round3_1, round3_2) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
 
-                connerctor.execute(sql,(mapid,get_map_name(nu-1),get_team_1_id(),get_team_2_id(),get_team_1_name(),get_team_2_name(),get_team_1_map_score(count-1,0),get_team_2_map_score(count-1,1),map_win_team(count-1),map_lose_team(count-1),get_date(),first_kills_team1(),first_kills_team2(),clutches_1_won(),clutches_2_won(),None,None))
+            connerctor.execute(sql,(mapid,map_id(nu-1),get_team_1_id(),get_team_2_id(),get_team_1_map_score(count-1,0),get_team_2_map_score(count-1,1),first_kills_team1(),first_kills_team2(),clutches_1_won(),clutches_2_won(),None,None))
 
                     #connerctor.commit()
 ##top_player
-                sql = "insert into top_players(match_id, map_id, most_kills_userid, most_kills_score, most_damage_user_id, most_damage_score, most_assists_user_id, most_assists_score, most_awp_kills_user_id, most_awp_kills_score, most_first_kills_user_id, most_first_kills_score, best_rating_user_id, best_rating_score) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            mvp =["",get_most_kills_score(), get_most_damage_score(), get_most_assists_score(), get_most_awp_kills_score(), get_most_first_kills_score(), get_best_rating_score() ]
+            mvppr = ["",get_most_kills_user_id(), get_most_damage_user_id(), get_most_assists_user_id(), get_most_awp_kills_user_id(), get_most_first_kills_user_id(), get_best_rating_user_id()]
 
-                connerctor.execute(sql,(mapid, mapsid, get_most_kills_user_id(), get_most_kills_score(), get_most_damage_user_id(), get_most_damage_score(), get_most_assists_user_id(), get_most_assists_score(), get_most_awp_kills_user_id(), get_most_awp_kills_score(), get_most_first_kills_user_id(), get_most_first_kills_score(), get_best_rating_user_id(), get_best_rating_score()))
+            ma=0
+            while ma < 6:
+                sql = "insert into top_players(player_id, sets_id, mvp_type, score) VALUES(?,?,?,?);"
+                ma += 1
+                connerctor.execute(sql,(mvppr[ma], mapsid,  ma, mvp[ma]))
                     #connerctor.commit()
-                print("unti" + str(i))
-                m = 1
-                while 11 > m:
-                    sql = "insert into player_matches(match_id, map_id, player_id, kill, assist, death, kd_ratio, adr, rating) VALUES(?,?,?,?,?,?,?,?,?);"
+            print("unti" + str(i))
+            m = 1
+            while 11 > m:
+                sql = "insert into player_matches(match_id, sets_id,map_id, player_id,  kill, assist, death, kd_ratio, adr, rating) VALUES(?,?,?,?,?,?,?,?,?,?);"
                         #print(str(m))
-                    if get_adr(0) == None:
+                if get_adr(0) == None:
 
-                        connerctor.execute(sql,(mapid, mapsid, get_player_id(1*m-1), get_kill(3*m-3), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(3*m-3), get_adr(m-1), get_rating(3*m-3)))
+                    connerctor.execute(sql,(mapid, mapsid, map_id(nu-1),  get_player_id(1*m-1), get_kill(3*m-3), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(3*m-3), get_adr(m-1), get_rating(3*m-3)))
 
-                    else:
-                        connerctor.execute(sql,(mapid, mapsid, get_player_id(1*m-1), get_kill(m-1), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(2*m-3), get_adr(m-1), get_rating(2*m-3)))
+                else:
+                    connerctor.execute(sql,(mapid, mapsid, map_id(nu-1), get_player_id(1*m-1), get_kill(m-1), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(2*m-3), get_adr(m-1), get_rating(2*m-3)))
                         #connerctor.commit()
-                    m+=1
+                m+=1
 
 
-
-                i += 1
+            if i % 100 == 0:
+                connerctor.commit()
+                print("commit")
+            i += 1
 
 
     else:
@@ -491,10 +527,11 @@ while 28003 > i:
             i += 1
             print("unti")
         else:
-            sql = "insert into matches(event, team_1_id, team_2_id, team_1_name, team_2_name, team_1_score, team_2_score, best_of, map_name_1, map_name_2, map_name_3, map_name_4, map_name_5, win_team, lose_tame) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            mapid += 1
 
-            connerctor.execute(sql,(event1(),get_team_1_id(),get_team_2_id(),get_team_1_name(),get_team_2_name(),get_team_1_1_score(),get_team_2_1_score(),get_best_of(),get_map_name(0),get_map_name(1),get_map_name(2),get_map_name(3),get_map_name(4),get_win_team(),get_lose_team()))
+            sql = "insert into matches(event, team_1_id, team_2_id, team_1_score, team_2_score, best_of, date) VALUES(?,?,?,?,?,?,?);"
 
+            connerctor.execute(sql,(event1(),get_team_1_id(),get_team_2_id(),get_team_1_1_score(),get_team_2_1_score(),get_best_of(),get_date()))
 
             for a in range(1, int(get_team_1_1_score())+int(get_team_2_1_score()+1)):
                 nu += 1
@@ -512,32 +549,43 @@ while 28003 > i:
                     #print(get_round_second_score(1,0))
 
                     ###map.db
-                sql = "insert into maps(match_id, map_name, team_1_id, team_2_id, team_1_name, team_2_name, team_1_map_score, team_2_map_score, map_win_team, map_lose_team, date, first_kills_team1, first_kills_team2, clutches_won_team1, clutches_won_team2, round3_1, round3_2) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
 
-                connerctor.execute(sql,(mapid,get_map_name(nu-1),get_team_1_id(),get_team_2_id(),get_team_1_name(),get_team_2_name(),get_team_1_map_score(count-1,0),get_team_2_map_score(count-1,1),map_win_team(count-1),map_lose_team(count-1),get_date(),first_kills_team1(),first_kills_team2(),clutches_1_won(),clutches_2_won(),None,None))
+                sql = "insert into sets(match_id, map_id, team_1_id, team_2_id, team_1_map_score, team_2_map_score, first_kills_team1, first_kills_team2, clutches_won_team1, clutches_won_team2, round3_1, round3_2) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
+
+                connerctor.execute(sql,(mapid, map_id(nu-1),get_team_1_id(),get_team_2_id(),get_team_1_map_score(count-1,0),get_team_2_map_score(count-1,1),first_kills_team1(),first_kills_team2(),clutches_1_won(),clutches_2_won(),None,None))
+
                     #connerctor.commit()
+
 ##top_players
-                sql = "insert into top_players(match_id, map_id, most_kills_userid, most_kills_score, most_damage_user_id, most_damage_score, most_assists_user_id, most_assists_score, most_awp_kills_user_id, most_awp_kills_score, most_first_kills_user_id, most_first_kills_score, best_rating_user_id, best_rating_score) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+                mvp =["",get_most_kills_score(), get_most_damage_score(), get_most_assists_score(), get_most_awp_kills_score(), get_most_first_kills_score(), get_best_rating_score() ]
+                mvppr = ["",get_most_kills_user_id(), get_most_damage_user_id(), get_most_assists_user_id(), get_most_awp_kills_user_id(), get_most_first_kills_user_id(), get_best_rating_user_id()]
 
-                connerctor.execute(sql,(mapid, mapsid, get_most_kills_user_id(), get_most_kills_score(), get_most_damage_user_id(), get_most_damage_score(), get_most_assists_user_id(), get_most_assists_score(), get_most_awp_kills_user_id(), get_most_awp_kills_score(), get_most_first_kills_user_id(), get_most_first_kills_score(), get_best_rating_user_id(), get_best_rating_score()))
+                m =1
+                ma=0
+                while 6 > ma:
+                    sql = "insert into top_players(player_id, sets_id, mvp_type, score) VALUES(?,?,?,?);"
+                    ma += 1
+                    connerctor.execute(sql,( mvppr[ma], mapsid, ma, mvp[ma]))
 
                     #connerctor.commit()
-                print("unti" +str(i))
+                #print("unti" +str(i))
                 m = 1
                 while 11 > m:
-                    sql = "insert into player_matches(match_id, map_id, player_id, kill, assist, death, kd_ratio, adr, rating) VALUES(?,?,?,?,?,?,?,?,?);"
+                    sql = "insert into player_matches(match_id, sets_id, map_id, player_id, kill, assist, death, kd_ratio, adr, rating) VALUES(?,?,?,?,?,?,?,?,?,?);"
                         #print(str(m))
                     if get_adr(0) == None:
-                        connerctor.execute(sql,(mapid, mapsid, get_player_id(1*m-1), get_kill(3*m-3), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(3*m-3), get_adr(m-1), get_rating(3*m-3)))
+                        connerctor.execute(sql,(mapid, mapsid, map_id(nu-1),  get_player_id(1*m-1), get_kill(3*m-3), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(3*m-3), get_adr(m-1), get_rating(3*m-3)))
 
                     else:
-                        connerctor.execute(sql,(mapid, mapsid, get_player_id(1*m-1), get_kill(m-1), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(2*m-3), get_adr(m-1), get_rating(2*m-3)))
+                        connerctor.execute(sql,(mapid, mapsid, map_id(nu-1), get_player_id(1*m-1), get_kill(m-1), get_assist(2*m-2), get_death(2*m-2), get_kd_ratio(2*m-3), get_adr(m-1), get_rating(2*m-3)))
                         #connerctor.commit()
                     m+=1
-
+                if i % 10 == 0:
+                    connerctor.commit()
+                    print("commit")
                 i += 1
-    connerctor.commit()
 print("end")
+connerctor.commit()
 connerctor.close()
 
 
