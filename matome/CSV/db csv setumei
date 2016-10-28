@@ -1,0 +1,10 @@
+.mode csv
+.output result.csv
+select * from aaaaa;
+
+or
+
+.headers on
+.mode csv
+.output result.csv
+select * from aaaa;
