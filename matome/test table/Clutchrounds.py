@@ -17,7 +17,7 @@ def get_win_lose(num):
     return win
 #win=num 0
 #lose=num 2
-pid = 9001
+pid = 9700
 urls = "http://www.hltv.org/?pageid=194&statsfilter=0&playerid="+str(pid)
 
 player = get_parsed_page(urls)
